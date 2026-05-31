@@ -49,8 +49,6 @@ const userSchema = new mongoose.Schema({
 
 );
 
-const User = mongoose.model("User",userSchema)
-
 //hashing password before saving user
 userSchema.pre("save", async function(next){
     if(!this.isModified("password")){
@@ -65,5 +63,14 @@ userSchema.pre("save", async function(next){
         next(error);
     }
 })
+
+userSchema.methods.matchPassword = async function(candidatePassword){
+    isPasswordCorrect= await bcrypt.compare(candidatePassword, this.password);
+    return isPasswordCorrect;
+}
+
+const User = mongoose.model("User",userSchema)
+
+
 
 export default User;
