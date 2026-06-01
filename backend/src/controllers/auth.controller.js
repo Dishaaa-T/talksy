@@ -68,12 +68,13 @@ export async function login(req, res) {
         if(!user){
             return res.status(401).json({message: "Invalid credentials"})
         }
-        const isPasswordCorrect = await user.matchPAssword(password);
+        
+        const isPasswordCorrect = await user.matchPassword(password);
         if(!isPasswordCorrect){
             return res.status(401).json({message: "Invalid credentials"})
         }
 
-        const token = jwt.sign({userId : newUser._id}, process.env.JWT_SECRET, {expiresIn: "7d"
+        const token = jwt.sign({userId : user._id}, process.env.JWT_SECRET, {expiresIn: "7d"
         })
 
         res.cookie("jwt", token,{
@@ -96,5 +97,9 @@ export async function login(req, res) {
 }
 
 export async function logout(req, res) {
-    res.send("Logout Route")
+    res.clearCookie("jwt", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",  
+});
+    res.status(200).json({message: "Logout successful", success: true})
 }
